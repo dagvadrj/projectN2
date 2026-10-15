@@ -1,0 +1,185 @@
+---
+title: "Environment variables"
+description: "Configure Supabase, payments, storage, AI renders, and model tooling through environment variables"
+---
+
+Tavilgamn reads its configuration from environment variables. Copy `.env.example` to `.env.local` for local development. Set the same variables in your deployment environment, such as Vercel **Project → Settings → Environment Variables**.
+
+Most integrations are optional. Leave a group empty to disable that feature.
+
+<Warning>
+Never commit secret values to the repository. Only variables prefixed with `NEXT_PUBLIC_` reach the browser. Keep every token, password, and API secret in server-only variables.
+</Warning>
+
+## Validate your configuration
+
+Run the environment check before you start the app or deploy:
+
+```bash
+# Development: incomplete optional groups produce warnings
+npm run env:check
+
+# Production: incomplete optional groups and a missing APP_URL fail the check
+npm run env:check:production
+```
+
+The check also enforces these rules:
+
+- `NEXT_PUBLIC_SUPABASE_URL`, `APP_URL`, `QPAY_BASE_URL`, `SOCIALPAY_BASE_URL`, and `CLOUDFLARE_RENDER_URL` must be absolute URLs.
+- Those URLs must use HTTPS, except on `localhost` or `127.0.0.1`.
+- Those URLs must not contain embedded credentials.
+
+On success, the check prints which optional features are fully configured.
+
+## Core
+
+These variables are required in every environment.
+
+| Variable | Description |
+| --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase project URL from **Project Settings → API**. |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Your Supabase publishable key. |
+| `SUPABASE_SECRET_KEY` | Server-only key for API routes and admin operations. |
+
+## Application URL
+
+| Variable | Description |
+| --- | --- |
+| `APP_URL` | Public production origin, for example `https://example.com`. Required in production. |
+
+Tavilgamn builds trusted payment callback URLs from `APP_URL`. Payment providers call back to `/api/payments/callback/<method>/<order-id>`. After a successful callback, Tavilgamn redirects the shopper to `/orders/<order-id>`. `APP_URL` must use HTTPS outside local development.
+
+## Payments
+
+Each payment method is optional. Set **all** variables in a group to enable that method, or leave the whole group empty. A partially configured group triggers a warning in development and fails the production check.
+
+### Bank transfer
+
+| Variable | Description |
+| --- | --- |
+| `BANK_NAME` | Bank name shown at checkout. |
+| `BANK_ACCOUNT` | Account number shown at checkout. |
+| `BANK_ACCOUNT_HOLDER` | Account holder name shown at checkout. |
+
+### QPay
+
+| Variable | Description |
+| --- | --- |
+| `QPAY_BASE_URL` | QPay merchant API base URL, for example `https://merchant.qpay.mn`. |
+| `QPAY_USERNAME` | QPay merchant username. |
+| `QPAY_PASSWORD` | QPay merchant password. |
+| `QPAY_INVOICE_CODE` | Invoice code assigned by QPay. |
+
+### SocialPay
+
+| Variable | Description |
+| --- | --- |
+| `SOCIALPAY_BASE_URL` | SocialPay API base URL. |
+| `SOCIALPAY_BEARER_TOKEN` | Bearer token for SocialPay API calls. |
+| `SOCIALPAY_SECRET` | Secret used to sign and verify SocialPay requests. |
+
+```bash .env.local
+APP_URL=https://example.com
+
+QPAY_BASE_URL=https://merchant.qpay.mn
+QPAY_USERNAME=your-username
+QPAY_PASSWORD=your-password
+QPAY_INVOICE_CODE=your-invoice-code
+```
+
+## Storage
+
+### Cloudinary images
+
+| Variable | Description |
+| --- | --- |
+| `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name. Required to display images that are already uploaded. |
+| `CLOUDINARY_API_KEY` | Cloudinary API key. Required to upload new images. |
+| `CLOUDINARY_API_SECRET` | Cloudinary API secret. Required to upload new images. |
+
+Set all three variables to enable image uploads.
+
+### Cloudflare R2 model storage
+
+Tavilgamn stores GLB models in Cloudflare R2. Model uploads and the model worker require the first four variables.
+
+| Variable | Description |
+| --- | --- |
+| `R2_ACCOUNT_ID` | Cloudflare account ID. |
+| `R2_ACCESS_KEY_ID` | R2 access key ID. |
+| `R2_SECRET_ACCESS_KEY` | R2 secret access key. |
+| `R2_BUCKET_NAME` | Name of the R2 bucket that holds models. |
+| `R2_PUBLIC_BASE_URL` | Optional. HTTPS base URL of a custom domain attached to the bucket, for example `https://assets.example.com`. |
+
+When `R2_PUBLIC_BASE_URL` is empty, Tavilgamn serves models through signed URLs. When it is set, Tavilgamn returns URLs on that domain so a CDN can cache public catalog assets. If you use a custom domain, allow your site origin with `GET` and `HEAD` in the bucket's [CORS settings](https://developers.cloudflare.com/r2/buckets/cors/).
+
+## AI kitchen renders
+
+Merchants can request AI-generated kitchen renders. `KITCHEN_RENDER_PROVIDER` selects the provider.
+
+| Variable | Description |
+| --- | --- |
+| `KITCHEN_RENDER_PROVIDER` | `openai` (default) or `cloudflare`. Any other value fails the check. |
+| `OPENAI_API_KEY` | OpenAI API key, used when the provider is `openai`. |
+| `OPENAI_IMAGE_MODEL` | OpenAI image model. Defaults to `gpt-image-2.5-sunburst`. |
+| `CLOUDFLARE_RENDER_URL` | URL of the kitchen render Cloudflare Worker's `/render` endpoint. Required when the provider is `cloudflare`. |
+| `CLOUDFLARE_RENDER_TOKEN` | Server-only shared secret. Must match the Worker secret `RENDER_TOKEN`. Required when the provider is `cloudflare`. |
+| `CLOUDFLARE_RENDER_FREE_CONFIRMED` | Set to `true` only after you confirm the Cloudflare account is on Workers Free. Defaults to `false`. |
+
+The application calls your own authenticated Worker, so it never needs an account-wide Cloudflare API token.
+
+<Warning>
+Workers Paid can bill for usage above the free allocation. Cloudflare renders stay disabled until `CLOUDFLARE_RENDER_FREE_CONFIRMED=true`. Reconfirm this flag if the account changes plan.
+</Warning>
+
+```bash .env.local
+KITCHEN_RENDER_PROVIDER=cloudflare
+CLOUDFLARE_RENDER_URL=https://tavilgamn-kitchen-render.<subdomain>.workers.dev/render
+CLOUDFLARE_RENDER_TOKEN=<same value as the Worker secret RENDER_TOKEN>
+CLOUDFLARE_RENDER_FREE_CONFIRMED=false
+```
+
+## SKP converter
+
+The SKP converter is an optional service that turns kitchen designs into SketchUp (`.skp`) files.
+
+| Variable | Description |
+| --- | --- |
+| `SKP_CONVERTER_URL` | Base URL of the converter, without the `/convert` path. Use HTTPS in production. `http://127.0.0.1:8789` is allowed for local development. |
+| `SKP_CONVERTER_TOKEN` | Bearer token shared with the converter server. Use a random value of at least 32 characters. |
+
+Redeploy after you change these values. `GET /api/kitchen/export/skp` returns `available: true` when the converter is configured. Never expose `SKP_CONVERTER_TOKEN` through a `NEXT_PUBLIC_` variable.
+
+## Model worker tools
+
+The model worker processes uploaded 3D models into optimized GLB files and previews. Start it with `npm run models:worker`.
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `BLENDER_BIN` | | Path to the Blender executable. |
+| `KTX_BIN` | | Path to the KTX tool used for texture compression. |
+| `MODEL_WORKER_POLL_MS` | `5000` | How often, in milliseconds, the worker checks for queued models. |
+| `MODEL_MAX_TRIANGLES` | `4000000` | Maximum triangle count accepted for a model. |
+| `MODEL_PREVIEW_TRIANGLES` | `80000` | Target triangle count for preview models. |
+| `MODEL_PREVIEW_TEXTURE_SIZE` | `512` | Texture size, in pixels, for preview models. |
+
+The worker also requires the Cloudflare R2 variables.
+
+## Model performance metrics
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `NEXT_PUBLIC_MODEL_METRICS_SAMPLE_RATE` | `0.1` | Fraction, from `0` to `1`, of browser model load timings sent to `/api/model-metrics`. |
+
+Values outside the range are clamped to `0` or `1`. Set `0` to disable reporting.
+
+## Contact details
+
+| Variable | Description |
+| --- | --- |
+| `CONTACT_EMAIL` | Public contact email. The email link stays hidden until you set a real address. |
+| `CONTACT_PHONE` | Optional public contact phone number. A built-in default number is used when empty. |
+
+<Note>
+Rebuild and redeploy after changing `CONTACT_EMAIL` or `CONTACT_PHONE`. The `/about` page is generated at build time, so it does not pick up new values until the next build.
+</Note>

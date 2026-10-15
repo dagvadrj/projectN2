@@ -1,0 +1,114 @@
+---
+title: "Authentication"
+description: "Set up Google and Apple sign-in through Supabase and understand role-based routing"
+---
+
+Tavilgamn uses Supabase Auth for email, Google, and Apple sign-in. You configure Google and Apple providers in the Supabase Dashboard, not in environment variables.
+
+<Warning>
+Enter provider secrets only in the Supabase Dashboard. Never add them to `NEXT_PUBLIC_*` variables or to the repository.
+</Warning>
+
+## Sign-in pages
+
+`/login`, `/register`, and `/auth/callback` use a dedicated sign-in layout without the store header and footer.
+
+## Role-based routing
+
+After sign-in, Tavilgamn reads the user's role from `profiles.role` and routes them:
+
+| Role | Destination |
+| --- | --- |
+| Merchant | `/merchant` |
+| Admin | `/admin` |
+| Any other user | `/account` |
+
+Merchants manage their profile at `/merchant?tab=profile`. Admins manage theirs at `/admin?tab=profile`. `/account` holds purchases, saved room designs, and orders.
+
+Tavilgamn preserves a `next` destination for checkout and for dashboard tabs the user is allowed to open.
+
+<Note>
+Signing up with Google or Apple never grants the merchant or admin role automatically. Assign roles through `profiles.role`.
+</Note>
+
+## Configure redirect URLs in Supabase
+
+<Steps>
+  <Step title="Set the Site URL">
+    In the Supabase Dashboard, open **Authentication → URL Configuration** and set your production Site URL.
+  </Step>
+  <Step title="Add redirect URLs">
+    Add these redirect URLs, replacing `<site>` with your domain:
+
+    ```text
+    https://<site>/auth/callback
+    https://<site>/auth/callback?next=*
+    ```
+
+    For local development, also add:
+
+    ```text
+    http://localhost:3000/auth/callback
+    http://localhost:3000/auth/callback?next=*
+    ```
+  </Step>
+  <Step title="Allow the email confirmation redirect">
+    Also allow the `/login?next=*` redirect used by email confirmation.
+  </Step>
+</Steps>
+
+## Google
+
+<Steps>
+  <Step title="Create an OAuth client">
+    In Google Cloud, create an OAuth client of type **Web application**.
+  </Step>
+  <Step title="Set redirect URI and origins">
+    Set the **Authorized redirect URI** to the Supabase callback, not your site's callback:
+
+    ```text
+    https://<project-ref>.supabase.co/auth/v1/callback
+    ```
+
+    Add your production origin to **Authorized JavaScript origins**. Add `http://localhost:3000` if you need local sign-in.
+  </Step>
+  <Step title="Enable the provider in Supabase">
+    Open **Authentication → Sign In / Providers → Google**. Enter the Client ID and Client Secret, then enable the provider.
+  </Step>
+</Steps>
+
+See the [Supabase Google guide](https://supabase.com/docs/guides/auth/social-login/auth-google) for details.
+
+## Apple
+
+<Steps>
+  <Step title="Create Apple identifiers">
+    In Apple Developer, create an App ID with **Sign in with Apple** enabled. Then create a linked Services ID and a signing key.
+  </Step>
+  <Step title="Set the domain and return URL">
+    Configure the website domain. Set the Return URL to the Supabase callback:
+
+    ```text
+    https://<project-ref>.supabase.co/auth/v1/callback
+    ```
+  </Step>
+  <Step title="Enable the provider in Supabase">
+    Generate a client secret from the Services ID and signing key. Enter it in the Supabase Apple provider settings, then enable the provider.
+  </Step>
+</Steps>
+
+<Warning>
+Apple OAuth client secrets expire. Regenerate the secret every 6 months.
+</Warning>
+
+Apple web OAuth does not always return the user's name. Users can add their name in the dashboard profile tab.
+
+See the [Supabase Apple guide](https://supabase.com/docs/guides/auth/social-login/auth-apple) for details.
+
+## Behavior and testing
+
+- If a provider is disabled, clicking its button shows an explanation and email sign-in remains available.
+- Users can retry after a cancelled or expired callback.
+- Account linking for users with the same email depends on your Supabase identity linking settings.
+
+After enabling each provider, test in production with new and existing accounts. Confirm that cancellation works, checkout redirects return correctly, and merchant and admin accounts land on the right dashboard.
