@@ -1,0 +1,125 @@
+---
+title: "Room and kitchen planner"
+description: "Plan a room or a modular kitchen in 3D, furnish it from the catalog, and save designs to your account."
+---
+
+The 3D room planner at `/planner` lets you build a to-scale model of your room and furnish it with products from the catalog. The kitchen planner at `/kitchen` lets you design a modular kitchen from individual cabinets and then place it in a room.
+
+Use the planners to check that furniture fits before you buy, to try different materials and lighting, and to compare several layouts side by side.
+
+<Tip>
+  Both planners include a guided tour. Select the **?** button at any time to reopen it.
+</Tip>
+
+## Room planner
+
+<Steps>
+  <Step title="Set up your room">
+    Open **Өрөө засах** (Edit room) and enter the room's real length, width and shape. When you create a new design or add a room, the measured plan opens immediately. For an existing room, open **Өрөөний бодит хэмжээ, хэлбэр** (Room dimensions and shape).
+
+    - Drag a wall or its round handle to resize it. Dimensions and floor area update live.
+    - Focus a wall and press the arrow keys to move it in 1 mm steps. Hold **Shift** for 10 mm steps.
+    - Type exact width, depth and height values in the inputs below the plan.
+
+    Moving a wall keeps the opposite wall, furniture, openings and lights in place. If a change would cause overlaps or invalid geometry, the planner keeps the last valid room.
+  </Step>
+  <Step title="Add doors and windows">
+    Open **Хаалга, цонх** (Doors and windows). Add an opening in any of these ways:
+
+    - Drag a template onto a wall.
+    - Select a template, then click a wall.
+    - Select **Хананд нэмэх** (Add to wall). The planner finds a free position on the chosen wall.
+
+    Click an existing opening to edit its size and position. To move it to another wall, change the wall selector.
+
+    - Doors come in single and double-leaf versions. Single doors support left or right hinges. Both support inward or outward swing. Double-click a door to open or close it.
+    - Windows come in fixed and sliding versions with an adjustable sill height.
+
+    Adding doors and windows helps you check that furniture won't block them.
+  </Step>
+  <Step title="Add furniture from the catalog">
+    Select **Тавилга нэмэх** (Add furniture) to open the catalog. Find products by category or search, check their dimensions, and select the add button to place them in the room.
+  </Step>
+  <Step title="Arrange furniture">
+    Select a piece in the room and drag it into position. With a piece selected, you can rotate or duplicate it. If a rotation would collide with a wall or other furniture, the planner shows a notice and keeps the original orientation.
+
+    To undo a mistake, select **Буцаах** (Undo) or press **Ctrl+Z**.
+  </Step>
+  <Step title="Check every angle">
+    View the room from above, from the front or from inside to check the layout.
+
+    - Use the **+** and **−** buttons on the right to zoom in and out.
+    - Select **Өрөөг бүтнээр харах** (Fit room) to fit the whole room on screen.
+    - The 3D camera rotates a full 360 degrees. Walls nearest the camera fade out so you can select objects behind them.
+  </Step>
+  <Step title="Choose materials and lighting">
+    Open **Өнгө** / **Материал** (Materials) to style each surface:
+
+    | Surface | Options |
+    |---|---|
+    | Floor (**Шал**) | Birch, oak or walnut parquet, laminates, tiles and carpets |
+    | Walls (**Хана**) | Paint, including a custom color, or wallpaper. Choose **Зөвхөн сонгосон хананд** (Selected wall only) or **Бүх хананд** (All walls) before picking a finish. |
+    | Ceiling (**Тааз**) | Height from 240 to 300 cm, with white paint or plaster |
+
+    Open **Гэрэл** (Lighting) to switch between day and evening, adjust ambient and sunlight intensity, and add up to eight ceiling fixtures. Each fixture has its own position, intensity and color.
+  </Step>
+  <Step title="Save your design">
+    Name your project and select **Хадгалах** (Save). Open **Тойм** (Summary) to review the selected furniture and total price. Select **Зураг** (Image) to download a PNG of the current view.
+  </Step>
+</Steps>
+
+### Keyboard shortcuts
+
+| Shortcut | Action |
+|---|---|
+| **Ctrl / ⌘ + Z** | Undo |
+| **Ctrl / ⌘ + Shift + Z** | Redo |
+| **Ctrl / ⌘ + D** | Duplicate the selected piece |
+| **Ctrl / ⌘ + S** | Save |
+| **Arrow keys** | Move the selected piece 10 cm |
+| **R** | Rotate 90° |
+| **Delete** | Remove the selected piece |
+| **Esc** | Clear the selection |
+
+## Kitchen planner
+
+<Steps>
+  <Step title="Enter the kitchen dimensions">
+    Open **Өрөөг тодорхойлох** (Define room) and enter the room size and the positions of doors and windows. Use real measurements. If existing cabinets won't fit in a new room size, the planner doesn't apply the change and explains why.
+  </Step>
+  <Step title="Add cabinets and appliances">
+    Choose modules from **Шүүгээ** (Cabinets) and appliances from **Төхөөрөмж** (Appliances). Base, wall and tall cabinets are separate pieces in 30, 40, 60 and 80 cm widths. Add a dining table and chairs from **Хоолны тавилга** (Dining furniture).
+
+    Drag cabinets in 3D. A cabinet within 120 mm of a wall snaps its back to the wall. A cabinet within 100 mm of a neighbor closes the gap. A red outline marks an invalid position, such as an overlap or a cabinet that exceeds the ceiling. Dropping a cabinet there returns it to its previous position. Press **Esc** to cancel a drag.
+  </Step>
+  <Step title="Pick a layout">
+    Use the **Байрлал** (Layout) menu to arrange the cabinets in a straight, L, U or two-sided (galley) layout. After changing the layout, check doors, windows and cabinet positions on the 2D plan. Select **Буцаах** (Undo) to restore the previous step.
+  </Step>
+  <Step title="Switch between 2D and 3D">
+    Check placement on the 2D plan, then view the kitchen in 3D or from inside. The **Урдаас** (Front) view helps you check cabinet heights and alignment. Select **Хэмжээс** (Dimensions) to toggle dimension labels.
+  </Step>
+  <Step title="Customize cabinets">
+    Select a cabinet and open **Загвар / Өнгө** (Style / Color) to choose a preset or change its parts. Apply colors, materials, door styles and handles to the selected module, the base and tall cabinets, the wall cabinets, or the whole kitchen. The countertop material is set separately.
+  </Step>
+  <Step title="Review and save">
+    Select **Үргэлжлүүлэх** (Continue) to review the kitchen's components, price and any warnings. Sign in to save the design.
+
+    - **Шинэ гарнитур** (New kitchen) starts a separate design.
+    - **Хадгалаад өрөөнд байрлуулах** (Save and place in room) opens the room planner and places the whole kitchen as one object if there's free space. You can also add a saved kitchen from the room planner's **Өөрийн загвар · гарнитур** (My designs · kitchens) section.
+  </Step>
+</Steps>
+
+<Note>
+  A kitchen placed in a room is a copy. Editing or deleting the original kitchen later doesn't change rooms where you already placed it. To use a newer version, remove the old one and place the updated kitchen again.
+</Note>
+
+## Compare and manage saved designs
+
+Saved room designs appear in the room planner's **Хадгалсан загвар** (Saved designs) list. Once you have at least two, check 2–4 designs in the list and select **Харьцуулах** (Compare) to view them side by side.
+
+Your saved designs also appear on your account page at `/account`:
+
+- **Хадгалсан өрөөний загвар** (Saved room designs)
+- **Хадгалсан гарнитур** (Saved kitchens)
+
+Room designs are stored on the device you saved them on. Saved kitchens are stored in your account, so you can open them from any device after signing in.
